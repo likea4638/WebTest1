@@ -44,6 +44,10 @@ jobs:
           mkdir -p deploy/web-box
           # 将主页复制到根目录
           cp index.html deploy/
+          # 复制 images 目录到根目录（供 index.html 使用）
+          if [ -d "images" ]; then
+            cp -r images deploy/
+          fi
           # 将 web 盒子构建文件复制到 web-box 子目录
           cp -r web便当盒/dist/* deploy/web-box/
       
