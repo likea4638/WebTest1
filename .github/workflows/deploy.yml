@@ -39,10 +39,18 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
       
+      - name: Prepare deployment
+        run: |
+          mkdir -p deploy/web-box
+          # 将主页复制到根目录
+          cp index.html deploy/
+          # 将 web 盒子构建文件复制到 web-box 子目录
+          cp -r web便当盒/dist/* deploy/web-box/
+      
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './web便当盒/dist'
+          path: './deploy'
 
   deploy:
     environment:
