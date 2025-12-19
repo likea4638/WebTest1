@@ -281,7 +281,7 @@
         <p class="subtitle">欢迎来到我的个人网站</p>
         
         <div class="button-group">
-            <a href="./web便当盒/static.html" class="button button-primary" target="_blank">
+            <a href="web便当盒/" class="button button-primary" target="_blank">
                 📦 打开每日资讯便当盒
             </a>
             <a href="#" class="button button-special" onclick="showPinkTree(); return false;">
@@ -293,7 +293,7 @@
         </div>
         
         <div class="info">
-            <p>🌐 Web 便当盒：<a href="./web便当盒/static.html" target="_blank">https://likea4638.github.io/WebTest1/web便当盒/</a></p>
+            <p>🌐 Web 便当盒：<a href="web便当盒/" target="_blank">https://likea4638.github.io/WebTest1/web便当盒/</a></p>
         </div>
     </div>
     <!-- 圣诞树全屏覆盖层 -->
@@ -343,7 +343,7 @@
 
         <!-- 手势控制提示 -->
         <div class="gesture-hint">
-            🤏 根据手势控制
+            🤏 根据手势控制 | 👆 点击空白隐藏UI
         </div>
     </div>
 
@@ -432,9 +432,10 @@
             -webkit-text-fill-color: transparent;
             font-family: 'Mountains of Christmas', cursive;
             opacity: 0.95;
-            transition: all 0.5s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             animation: sparkle 3s ease-in-out infinite;
+            pointer-events: auto;
         }
         
         @keyframes sparkle {
@@ -608,9 +609,11 @@
             border: 1px solid rgba(255,153,204,0.3);
             pointer-events: auto;
             text-decoration: none;
-            transition: all 0.3s;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: 'Mountains of Christmas', cursive;
             font-weight: 700;
+            opacity: 1;
+            visibility: visible;
         }
         
         #christmas-tree-overlay .back-btn:hover {
@@ -662,6 +665,9 @@
             border-radius: 15px;
             backdrop-filter: blur(3px);
             border: 1px solid rgba(255, 153, 204, 0.2);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            visibility: visible;
         }
     </style>
 
@@ -1213,6 +1219,31 @@
             });
         }
 
+        let uiVisible = true;
+        
+        function toggleUI() {
+            const audioControls = document.querySelector('#christmas-tree-overlay .audio-controls');
+            const backBtn = document.querySelector('#christmas-tree-overlay .back-btn');
+            const gestureHint = document.querySelector('#christmas-tree-overlay .gesture-hint');
+            const title = document.querySelector('#christmas-tree-overlay .christmas-title');
+            
+            uiVisible = !uiVisible;
+            
+            if (uiVisible) {
+                // 显示UI
+                if (audioControls) audioControls.classList.remove('ui-hidden');
+                if (backBtn) backBtn.classList.remove('ui-hidden');
+                if (gestureHint) gestureHint.classList.remove('ui-hidden');
+                if (title) title.classList.remove('ui-hidden');
+            } else {
+                // 隐藏UI
+                if (audioControls) audioControls.classList.add('ui-hidden');
+                if (backBtn) backBtn.classList.add('ui-hidden');
+                if (gestureHint) gestureHint.classList.add('ui-hidden');
+                if (title) title.classList.add('ui-hidden');
+            }
+        }
+
         function setupEvents() {
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
@@ -1223,12 +1254,29 @@
             
             document.getElementById('file-input').addEventListener('change', handleImageUpload);
             
+            // 键盘事件
             window.addEventListener('keydown', (e) => {
                 if (e.key.toLowerCase() === 'h') {
-                    const controls = document.querySelector('.audio-controls');
+                    const controls = document.querySelector('#christmas-tree-overlay .audio-controls');
                     if (controls) controls.classList.toggle('ui-hidden');
                 }
             });
+            
+            // 点击/触摸空白区域隐藏/显示UI
+            const christmasOverlay = document.getElementById('christmas-tree-overlay');
+            if (christmasOverlay) {
+                const handleInteraction = (e) => {
+                    // 检查点击的是否是空白区域（canvas或overlay本身）
+                    if (e.target === christmasOverlay || e.target.id === 'canvas-container' || e.target.tagName === 'CANVAS') {
+                        e.preventDefault();
+                        toggleUI();
+                    }
+                };
+                
+                // 支持鼠标点击和触摸
+                christmasOverlay.addEventListener('click', handleInteraction);
+                christmasOverlay.addEventListener('touchend', handleInteraction);
+            }
         }
 
         function animate() {

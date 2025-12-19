@@ -1,12 +1,18 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Web 便当盒</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web 便当盒 - 重定向</title>
+    <script>
+        // 立即重定向到静态版本
+        window.location.replace('./static.html');
+    </script>
+</head>
+<body>
+    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h2>正在跳转到 Web 便当盒...</h2>
+        <p>如果没有自动跳转，请<a href="./static.html">点击这里</a></p>
+    </div>
+</body>
 </html>
