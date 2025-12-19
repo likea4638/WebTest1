@@ -359,11 +359,11 @@
                         <p class="header-time" id="current-time"></p>
                     </div>
                     <div class="header-actions">
-                        <button onclick="toggleTranslation()" class="translate-btn" id="translate-btn" title="翻译开关">
+                        <button onclick="toggleTranslation()" class="translate-btn" id="translate-btn" title="一键翻译所有项目名称和描述">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
                             </svg>
-                            英中翻译
+                            一键翻译
                         </button>
                         <button onclick="refreshAllData()" class="refresh-all-btn" title="刷新热榜">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -726,8 +726,48 @@
             --text-sub: #aab0c4;
             --text-weak: #6b7280;
             --accent: #5da9ff;
+            --accent-secondary: #7c3aed;
             --border-soft: rgba(255,255,255,0.1);
             --hover-glow: rgba(93, 169, 255, 0.15);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-accent: linear-gradient(135deg, #5da9ff 0%, #7c3aed 100%);
+        }
+
+        /* 精美装饰元素 */
+        #lunchbox-overlay::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(93, 169, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 动态背景粒子效果 */
+        .lunchbox-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.02) 1px, transparent 1px),
+                radial-gradient(circle at 75% 75%, rgba(93, 169, 255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px, 80px 80px;
+            animation: float-particles 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float-particles {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
         }
 
         /* 容器布局 */
@@ -736,6 +776,8 @@
             margin: 0 auto;
             padding: 40px 20px;
             min-height: 100vh;
+            position: relative;
+            z-index: 2;
         }
 
         /* 标题区域 */
@@ -753,9 +795,25 @@
         .header-title {
             font-size: 48px;
             font-weight: 700;
-            color: var(--text-main);
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin: 0 0 8px 0;
             line-height: 1.1;
+            position: relative;
+        }
+
+        .header-title::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--gradient-accent);
+            border-radius: 2px;
+            opacity: 0.6;
         }
 
         .header-subtitle {
@@ -790,21 +848,45 @@
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .translate-btn::before, .refresh-all-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .translate-btn:hover::before, .refresh-all-btn:hover::before {
+            left: 100%;
         }
 
         .translate-btn:hover, .refresh-all-btn:hover {
             background: rgba(255,255,255,0.1);
             color: var(--accent);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3), 0 0 20px rgba(93, 169, 255, 0.2);
+            border-color: rgba(93, 169, 255, 0.3);
         }
 
         .translate-btn.active {
-            background: rgba(93, 169, 255, 0.2);
-            color: var(--accent);
-            border-color: rgba(93, 169, 255, 0.4);
+            background: var(--gradient-accent);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(93, 169, 255, 0.4);
+        }
+
+        .translate-btn.active:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(93, 169, 255, 0.5);
         }
 
         .back-btn {
@@ -815,14 +897,33 @@
             border-radius: 12px;
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .back-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .back-btn:hover::before {
+            left: 100%;
         }
 
         .back-btn:hover {
-            background: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.15);
             color: var(--text-main);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.2);
         }
 
         /* 卡片网格 */
@@ -833,29 +934,80 @@
             margin-bottom: 60px;
         }
 
+        /* 卡片入场动画 */
+        .repo-card {
+            animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .repo-card:nth-child(1) { animation-delay: 0.1s; }
+        .repo-card:nth-child(2) { animation-delay: 0.2s; }
+        .repo-card:nth-child(3) { animation-delay: 0.3s; }
+        .repo-card:nth-child(4) { animation-delay: 0.4s; }
+        .repo-card:nth-child(5) { animation-delay: 0.5s; }
+        .repo-card:nth-child(6) { animation-delay: 0.6s; }
+        .repo-card:nth-child(7) { animation-delay: 0.7s; }
+        .repo-card:nth-child(8) { animation-delay: 0.8s; }
+        .repo-card:nth-child(9) { animation-delay: 0.9s; }
+        .repo-card:nth-child(10) { animation-delay: 1.0s; }
+
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* 单个项目卡片 */
         .repo-card {
             background: var(--card-bg);
             border-radius: 16px;
             padding: 24px;
             border: 1px solid var(--border-soft);
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             position: relative;
             backdrop-filter: blur(10px);
             text-decoration: none;
             color: inherit;
+            overflow: hidden;
+        }
+
+        .repo-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .repo-card:hover::before {
+            left: 100%;
         }
 
         .repo-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 0 1px var(--hover-glow);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.4), 
+                0 0 0 1px var(--hover-glow),
+                0 0 20px rgba(93, 169, 255, 0.2);
             background: rgba(255,255,255,0.08);
+            border-color: rgba(93, 169, 255, 0.3);
         }
 
         .repo-card:hover .view-project {
             opacity: 1;
             transform: translateX(0);
+        }
+
+        .repo-card:hover .rank-badge {
+            background: var(--gradient-accent);
+            color: white;
+            transform: scale(1.1);
         }
 
         /* 排名徽章 */
@@ -867,9 +1019,18 @@
             color: var(--accent);
             font-size: 12px;
             font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 6px 10px;
+            border-radius: 8px;
             border: 1px solid rgba(93, 169, 255, 0.3);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .rank-badge.top-3 {
+            background: var(--gradient-accent);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(93, 169, 255, 0.3);
         }
 
         /* 项目名称 */
@@ -880,6 +1041,21 @@
             margin: 0 0 8px 0;
             line-height: 1.3;
             padding-right: 50px;
+        }
+
+        /* 项目名称翻译 */
+        .name-translated {
+            font-size: 14px;
+            color: var(--accent);
+            margin-top: 4px;
+            font-weight: 400;
+            font-style: italic;
+            opacity: 0.8;
+            display: none;
+        }
+
+        .name-translated.show {
+            display: block;
         }
 
         /* 项目描述 */
@@ -931,6 +1107,8 @@
             height: 12px;
             border-radius: 50%;
             flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .stars-count {
@@ -964,13 +1142,15 @@
         }
 
         .loading-spinner {
-            width: 32px;
-            height: 32px;
-            border: 2px solid rgba(255,255,255,0.1);
-            border-top: 2px solid var(--accent);
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--accent);
+            border-right: 3px solid var(--accent-secondary);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
             margin-bottom: 16px;
+            box-shadow: 0 0 20px rgba(93, 169, 255, 0.3);
         }
 
         @keyframes spin {
@@ -984,8 +1164,29 @@
             color: var(--text-weak);
             font-size: 12px;
             line-height: 1.6;
-            padding-top: 40px;
+            padding: 40px 0;
             border-top: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+
+        .lunchbox-footer::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: var(--gradient-accent);
+            border-radius: 1px;
+        }
+
+        .lunchbox-footer p:last-child {
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
         }
 
         /* 响应式设计 */
@@ -1131,16 +1332,16 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
-                    翻译开启
+                    翻译已开启
                 `;
-                translateAllDescriptions();
+                translateAllContent();
             } else {
                 btn.classList.remove('active');
                 btn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
                     </svg>
-                    英中翻译
+                    一键翻译
                 `;
                 hideAllTranslations();
             }
@@ -1190,9 +1391,28 @@
             }
         }
         
-        async function translateAllDescriptions() {
+        async function translateAllContent() {
+            // 翻译所有项目名称
+            const nameTranslations = document.querySelectorAll('.name-translated');
+            for (let nameEl of nameTranslations) {
+                const originalText = nameEl.dataset.original;
+                if (originalText && !nameEl.textContent.trim()) {
+                    nameEl.textContent = '翻译中...';
+                    nameEl.classList.add('show');
+                    
+                    try {
+                        const translation = await translateProjectName(originalText);
+                        nameEl.textContent = `(${translation})`;
+                    } catch (error) {
+                        nameEl.textContent = '(翻译失败)';
+                    }
+                } else if (originalText) {
+                    nameEl.classList.add('show');
+                }
+            }
+
+            // 翻译项目描述（如果有的话）
             const descriptions = document.querySelectorAll('.description-translated');
-            
             for (let desc of descriptions) {
                 const originalText = desc.dataset.original;
                 if (originalText && !desc.textContent.trim()) {
@@ -1210,11 +1430,51 @@
                 }
             }
         }
+
+        // 专门用于翻译项目名称的函数
+        async function translateProjectName(projectName) {
+            // 检查缓存
+            const cacheKey = `name:${projectName}`;
+            if (translationCache.has(cacheKey)) {
+                return translationCache.get(cacheKey);
+            }
+
+            // 提取项目名称的有意义部分（去掉用户名/组织名）
+            const nameOnly = projectName.includes('/') ? projectName.split('/')[1] : projectName;
+            
+            // 如果项目名称很短或包含中文，直接返回
+            if (nameOnly.length < 3 || /[\u4e00-\u9fa5]/.test(nameOnly)) {
+                return nameOnly;
+            }
+
+            try {
+                // 对于项目名称，我们需要更智能的翻译
+                // 先尝试将连字符、下划线等替换为空格，让翻译更准确
+                const processedName = nameOnly
+                    .replace(/[-_]/g, ' ')
+                    .replace(/([a-z])([A-Z])/g, '$1 $2') // 处理驼峰命名
+                    .toLowerCase();
+
+                const translation = await translateText(processedName);
+                translationCache.set(cacheKey, translation);
+                return translation;
+            } catch (error) {
+                console.error('Project name translation error:', error);
+                return '翻译失败';
+            }
+        }
         
         function hideAllTranslations() {
+            // 隐藏描述翻译
             const descriptions = document.querySelectorAll('.description-translated');
             descriptions.forEach(desc => {
                 desc.classList.remove('show');
+            });
+
+            // 隐藏项目名称翻译
+            const nameTranslations = document.querySelectorAll('.name-translated');
+            nameTranslations.forEach(name => {
+                name.classList.remove('show');
             });
         }
         
@@ -1247,7 +1507,8 @@
                     language: repo.language || 'Unknown',
                     languageColor: getLanguageColor(repo.language),
                     stars: formatStars(repo.stargazers_count),
-                    url: repo.html_url
+                    url: repo.html_url,
+                    hasDescription: !!(repo.description && repo.description.trim())
                 }));
             } catch (error) {
                 console.error('Error fetching GitHub trending:', error);
@@ -1305,31 +1566,42 @@
                 
                 const repos = await fetchGitHubTrending();
                 
-                container.innerHTML = repos.map((repo, index) => `
-                    <a href="${repo.url}" target="_blank" rel="noopener noreferrer" class="repo-card">
-                        <div class="rank-badge">#${index + 1}</div>
-                        <h3 class="repo-name">${repo.name}</h3>
-                        <div class="repo-description">
-                            <div class="description-original">${repo.description}</div>
-                            <div class="description-translated ${translationEnabled ? 'show' : ''}" data-original="${repo.description.replace(/"/g, '&quot;')}"></div>
-                        </div>
-                        <div class="repo-meta">
-                            <div class="language-tag">
-                                <div class="language-dot" style="background-color: ${repo.languageColor}"></div>
-                                <span>${repo.language}</span>
+                container.innerHTML = repos.map((repo, index) => {
+                    const isTop3 = index < 3;
+                    const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+                    
+                    // 判断是否有有效描述
+                    const hasDescription = repo.hasDescription;
+                    
+                    return `
+                        <a href="${repo.url}" target="_blank" rel="noopener noreferrer" class="repo-card">
+                            <div class="rank-badge ${isTop3 ? 'top-3' : ''}">${rankEmoji}#${index + 1}</div>
+                            <h3 class="repo-name">
+                                ${repo.name}
+                                <div class="name-translated ${translationEnabled ? 'show' : ''}" data-original="${repo.name.replace(/"/g, '&quot;')}" data-type="name"></div>
+                            </h3>
+                            <div class="repo-description">
+                                <div class="description-original">${repo.description}</div>
+                                ${hasDescription ? `<div class="description-translated ${translationEnabled ? 'show' : ''}" data-original="${repo.description.replace(/"/g, '&quot;')}" data-type="description"></div>` : ''}
                             </div>
-                            <div class="stars-count">
-                                <span>⭐</span>
-                                <span>${repo.stars}</span>
+                            <div class="repo-meta">
+                                <div class="language-tag">
+                                    <div class="language-dot" style="background-color: ${repo.languageColor}"></div>
+                                    <span>${repo.language}</span>
+                                </div>
+                                <div class="stars-count">
+                                    <span>⭐</span>
+                                    <span>${repo.stars}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="view-project">查看项目 →</div>
-                    </a>
-                `).join('');
+                            <div class="view-project">查看项目 →</div>
+                        </a>
+                    `;
+                }).join('');
                 
                 // 如果翻译已开启，自动翻译新加载的内容
                 if (translationEnabled) {
-                    setTimeout(() => translateAllDescriptions(), 100);
+                    setTimeout(() => translateAllContent(), 100);
                 }
                 
             } catch (error) {
